@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -50,6 +52,31 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    // --- Networking (PodPlay-style requirement) ---
+    // Retrofit = API calls, Moshi = JSON parsing
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.11.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // --- Images ---
+    // Coil is the simplest way to load artwork into Compose
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // --- Navigation ---
+    // Basic screen navigation (Search -> Detail -> Player)
+    implementation("androidx.navigation:navigation-compose:2.8.5")
+
+    // --- Local storage (Subscriptions) ---
+    // Room DB so "Subscribe" is real and saved locally
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+
+    // --- Audio Playback ---
+    // Media3 (ExoPlayer) = simplest reliable audio player for streams
+    implementation("androidx.media3:media3-exoplayer:1.5.1")
+    implementation("androidx.media3:media3-ui:1.5.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
