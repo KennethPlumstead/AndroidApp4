@@ -1,5 +1,6 @@
 package com.kennyschool.superpodcast.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,70 +43,72 @@ fun SubscriptionsScreen(
         }
     ) { padding ->
 
-        when {
-            state.loading -> {
-                Box(
-                    modifier = Modifier
-                        .padding(padding)
-                        .fillMaxSize(),
-                    contentAlignment = androidx.compose.ui.Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+        // One consistent background for the whole screen
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(padding)
+        ) {
+            when {
+                state.loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
-            }
 
-            state.error != null -> {
-                Column(
-                    modifier = Modifier
-                        .padding(padding)
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    Text(state.error!!, color = MaterialTheme.colorScheme.error)
+                state.error != null -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        Text(state.error!!, color = MaterialTheme.colorScheme.error)
+                    }
                 }
-            }
 
-            state.items.isEmpty() -> {
-                Column(
-                    modifier = Modifier
-                        .padding(padding)
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    Text("No subscriptions yet.")
-                    Spacer(Modifier.height(8.dp))
-                    Text("Go to Search, open a podcast, and tap Subscribe.")
+                state.items.isEmpty() -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        Text("No subscriptions yet.", style = MaterialTheme.typography.titleMedium)
+                        Spacer(Modifier.height(8.dp))
+                        Text("Go to Search, open a podcast, and tap Subscribe.")
+                    }
                 }
-            }
 
-            else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(padding)
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    contentPadding = PaddingValues(bottom = 16.dp)
-                ) {
-                    items(state.items) { sub ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 10.dp)
-                                .clickable {
-                                    onOpenPodcast(sub.feedUrl, sub.artworkUrl, sub.title)
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentPadding = PaddingValues(bottom = 16.dp)
+                    ) {
+                        items(state.items) { sub ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 10.dp)
+                                    .clickable {
+                                        onOpenPodcast(sub.feedUrl, sub.artworkUrl, sub.title)
+                                    },
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                            ) {
+                                Row(Modifier.padding(12.dp)) {
+                                    AsyncImage(
+                                        model = sub.artworkUrl,
+                                        contentDescription = "Podcast artwork",
+                                        modifier = Modifier.size(64.dp)
+                                    )
+                                    Spacer(Modifier.width(12.dp))
+                                    Text(
+                                        text = sub.title,
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
                                 }
-                        ) {
-                            Row(Modifier.padding(12.dp)) {
-                                AsyncImage(
-                                    model = sub.artworkUrl,
-                                    contentDescription = "Podcast artwork",
-                                    modifier = Modifier.size(64.dp)
-                                )
-                                Spacer(Modifier.width(12.dp))
-                                Text(
-                                    text = sub.title,
-                                    style = MaterialTheme.typography.titleMedium
-                                )
                             }
                         }
                     }

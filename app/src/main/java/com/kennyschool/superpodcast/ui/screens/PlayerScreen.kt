@@ -1,5 +1,6 @@
 package com.kennyschool.superpodcast.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -51,8 +52,6 @@ fun PlayerScreen(
             override fun onIsPlayingChanged(playing: Boolean) {
                 isPlaying = playing
 
-                // If it's not playing AND user wanted play, it might be buffering.
-                // If user didn't want play, it's just paused/stopped.
                 status = when {
                     playing -> "Playing"
                     userWantsPlay -> "Buffering..."
@@ -92,11 +91,14 @@ fun PlayerScreen(
             TopAppBar(
                 title = { Text("Player") },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        player.pause()
-                        userWantsPlay = false
-                        onBack()
-                    }) {
+                    IconButton(
+                        onClick = {
+                            // small safety cleanup so audio doesn’t keep playing after leaving
+                            player.pause()
+                            userWantsPlay = false
+                            onBack()
+                        }
+                    ) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
@@ -105,8 +107,9 @@ fun PlayerScreen(
     ) { padding ->
         Column(
             modifier = Modifier
-                .padding(padding)
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(padding)
                 .padding(16.dp)
         ) {
             Text(text = "Now Playing", style = MaterialTheme.typography.titleMedium)
@@ -120,12 +123,10 @@ fun PlayerScreen(
                     if (audioUrl.isBlank()) return@Button
 
                     if (isPlaying) {
-                        // Pause
                         player.pause()
                         userWantsPlay = false
                         status = "Paused"
                     } else {
-                        // Play
                         userWantsPlay = true
                         status = "Buffering..."
                         player.play()
@@ -137,8 +138,22 @@ fun PlayerScreen(
                 Text(if (isPlaying) "Pause" else "Play")
             }
 
-            Spacer(Modifier.height(12.dp))
-            Text(text = status, style = MaterialTheme.typography.bodyMedium)
+            Spacer(Modifier.height(14.dp))
+
+            // Status looks nicer as a “card” instead of plain text
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = status,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(12.dp)
+                )
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.kennyschool.superpodcast.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,6 +32,7 @@ fun SearchScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
         Text(
@@ -55,7 +57,6 @@ fun SearchScreen(
             enabled = !state.loading,
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Simple feedback while it loads
             Text(if (state.loading) "Searching..." else "Search")
         }
 
@@ -78,7 +79,6 @@ fun SearchScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        // Results list
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 16.dp)
@@ -90,10 +90,13 @@ fun SearchScreen(
                         .padding(bottom = 10.dp)
                         .clickable {
                             onOpenPodcast(podcast.feedUrl, podcast.artworkUrl, podcast.title)
-                        }
+                        },
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                 ) {
                     Row(Modifier.padding(12.dp)) {
-                        // Artwork (if it fails to load, it just shows blank—fine for an assignment)
                         AsyncImage(
                             model = podcast.artworkUrl,
                             contentDescription = "Podcast artwork",

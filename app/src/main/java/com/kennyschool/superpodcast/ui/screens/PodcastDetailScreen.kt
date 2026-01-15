@@ -1,11 +1,12 @@
 package com.kennyschool.superpodcast.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,25 +15,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.kennyschool.superpodcast.ui.viewmodel.DetailViewModel
 
-/**
- * Podcast detail:
- * - shows artwork + title
- * - lets me subscribe/unsubscribe (Room)
- * - loads episodes from RSS and shows a list
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PodcastDetailScreen(
     feedUrl: String,
     artworkUrl: String,
     title: String,
-    onPlay: (audioUrl: String, episodeTitle: String) -> Unit,
     onBack: () -> Unit,
+    onPlay: (audioUrl: String, episodeTitle: String) -> Unit,
     vm: DetailViewModel = viewModel()
 ) {
     val state by vm.state.collectAsState()
 
-    // Load once when this screen opens (or if feedUrl changes).
     LaunchedEffect(feedUrl) {
         vm.load(feedUrl)
     }
@@ -40,10 +34,13 @@ fun PodcastDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Podcast") },
+                title = { Text(title) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
                     }
                 }
             )
@@ -51,21 +48,26 @@ fun PodcastDetailScreen(
     ) { padding ->
         Column(
             modifier = Modifier
-                .padding(padding)
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(padding)
                 .padding(16.dp)
         ) {
             Row {
                 AsyncImage(
                     model = artworkUrl,
                     contentDescription = "Podcast artwork",
-                    modifier = Modifier.size(80.dp)
+                    modifier = Modifier.size(90.dp)
                 )
 
                 Spacer(Modifier.width(12.dp))
 
                 Column(Modifier.weight(1f)) {
-                    Text(text = title, style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+
                     Spacer(Modifier.height(8.dp))
 
                     Button(
@@ -76,7 +78,7 @@ fun PodcastDetailScreen(
                 }
             }
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(16.dp))
 
             state.error?.let { msg ->
                 Text(text = msg, color = MaterialTheme.colorScheme.error)
@@ -89,7 +91,11 @@ fun PodcastDetailScreen(
                 return@Column
             }
 
-            Text(text = "Episodes", style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = "Episodes",
+                style = MaterialTheme.typography.titleMedium
+            )
+
             Spacer(Modifier.height(8.dp))
 
             LazyColumn(
@@ -103,10 +109,17 @@ fun PodcastDetailScreen(
                             .padding(bottom = 10.dp)
                             .clickable {
                                 onPlay(ep.audioUrl, ep.title)
-                            }
+                            },
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                     ) {
                         Column(Modifier.padding(12.dp)) {
-                            Text(text = ep.title, style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                text = ep.title,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
                         }
                     }
                 }
